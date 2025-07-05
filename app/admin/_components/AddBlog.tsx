@@ -8,10 +8,20 @@ import { useId } from "react";
 import { toast } from "sonner";
 
 // Dynamically import TinyMCE Editor with proper typing
-const Editor = dynamic(
+// import dynamic from "next/dynamic";
+import type { ComponentProps } from "react";
+import { Editor as TinyMCEEditor } from "@tinymce/tinymce-react";
+
+// Get the correct props type from the actual component
+type TinyMCEEditorProps = ComponentProps<typeof TinyMCEEditor>;
+
+// Dynamically import the Editor with correct typing
+const Editor = dynamic<TinyMCEEditorProps>(
   () => import("@tinymce/tinymce-react").then((mod) => mod.Editor),
   { ssr: false }
 );
+
+
 
 // Type for the blog data returned from API
 type BlogData = {
