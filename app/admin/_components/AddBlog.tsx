@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, ChangeEvent } from "react";
 import dynamic from "next/dynamic";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,33 +7,44 @@ import { Label } from "@/components/ui/label";
 import { useId } from "react";
 import { toast } from "sonner";
 
-
-
+// Dynamically import TinyMCE Editor with proper typing
 const Editor = dynamic(
-  () => import("@tinymce/tinymce-react").then((mod) => mod.Editor as any),
-  {
-    ssr: false,
-  }
+  () => import("@tinymce/tinymce-react").then((mod) => mod.Editor),
+  { ssr: false }
 );
+
+// Type for the blog data returned from API
+type BlogData = {
+  title: string;
+  content: string;
+  bannerImage: string;
+};
+
+// API response shape
+type BlogApiResponse = {
+  success: boolean;
+  data?: BlogData;
+  error?: string;
+};
+
 type AddBlogProps = {
   editingBlogId?: string;
   onSaveSuccess?: () => void;
 };
 
 export default function AddBlog({ editingBlogId, onSaveSuccess }: AddBlogProps) {
-  const [content, setContent] = useState("");
-  const [title, setTitle] = useState("");
-  const [bannerImage, setBannerImage] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [content, setContent] = useState<string>("");
+  const [title, setTitle] = useState<string>("");
+  const [bannerImage, setBannerImage] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
   const fileInputId = useId();
 
-  // If editing, fetch the blog data and prepopulate the form
   useEffect(() => {
     if (editingBlogId) {
       async function fetchBlog() {
         try {
           const response = await fetch(`/api/blog?id=${editingBlogId}`);
-          const data = await response.json();
+          const data: BlogApiResponse = await response.json();
           if (data.success && data.data) {
             const blog = data.data;
             setTitle(blog.title);
@@ -52,12 +63,12 @@ export default function AddBlog({ editingBlogId, onSaveSuccess }: AddBlogProps) 
     setContent(newContent);
   };
 
-  const handleBannerImageChange = (e) => {
+  const handleBannerImageChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setBannerImage(reader.result);
+        setBannerImage(reader.result as string);
       };
       reader.readAsDataURL(file);
     }
@@ -67,7 +78,6 @@ export default function AddBlog({ editingBlogId, onSaveSuccess }: AddBlogProps) 
     setLoading(true);
     try {
       const payload = { title, content, bannerImage };
-      // If editing, use PUT; otherwise, POST
       const endpoint = editingBlogId ? `/api/blog?id=${editingBlogId}` : "/api/blog";
       const method = editingBlogId ? "PUT" : "POST";
       const response = await fetch(endpoint, {
@@ -75,17 +85,16 @@ export default function AddBlog({ editingBlogId, onSaveSuccess }: AddBlogProps) 
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      const data = await response.json();
+      const data: BlogApiResponse = await response.json();
+
       if (response.ok && data.success) {
-        // Clear the form if needed
         setTitle("");
         setContent("");
         setBannerImage("");
         toast.success(
           editingBlogId ? "Blog updated successfully!" : "Blog saved successfully!"
         );
-        // Inform AdminPage to switch views (e.g. to the blog list)
-        onSaveSuccess && onSaveSuccess();
+        onSaveSuccess?.();
       } else {
         toast.error(editingBlogId ? "Failed to update Blog." : "Failed to save Blog.");
       }
@@ -98,7 +107,6 @@ export default function AddBlog({ editingBlogId, onSaveSuccess }: AddBlogProps) 
 
   return (
     <div className="relative p-5 max-h-[90vh] overflow-y-auto">
-      {/* Save/Update Button */}
       <div className="absolute top-5 right-5">
         <Button onClick={handleSave} disabled={loading}>
           {loading
@@ -113,7 +121,6 @@ export default function AddBlog({ editingBlogId, onSaveSuccess }: AddBlogProps) 
       <h1 className="font-bold text-3xl mb-5">
         {editingBlogId ? "Edit Blog" : "Add Blog"}
       </h1>
-      {/* Title Input */}
       <div className="mb-2">
         <input
           type="text"
@@ -123,7 +130,6 @@ export default function AddBlog({ editingBlogId, onSaveSuccess }: AddBlogProps) 
           className="w-full p-2 text-base border border-gray-300 rounded-md"
         />
       </div>
-      {/* Banner Image File Input */}
       <div className="space-y-2 min-w-[300px] mb-4">
         <Label htmlFor={fileInputId}>Banner Image</Label>
         <Input
@@ -133,7 +139,7 @@ export default function AddBlog({ editingBlogId, onSaveSuccess }: AddBlogProps) 
           className="p-0 pe-3 file:me-3 file:border-0 file:border-e"
         />
       </div>
-      {/* Rich Text Editor */}
+
       <Editor
         apiKey="mc2m2hony20e98yoeq3psgr1tq3fj16x93a43dr8rxvxfd96"
         value={content}
@@ -157,11 +163,11 @@ export default function AddBlog({ editingBlogId, onSaveSuccess }: AddBlogProps) 
               input.setAttribute("type", "file");
               input.setAttribute("accept", "image/*");
               input.onchange = function () {
-                const file = this.files ? this.files[0] : null;
+                const file = (this as HTMLInputElement).files?.[0];
                 if (file) {
                   const reader = new FileReader();
                   reader.onload = function () {
-                    callback(reader.result, { alt: file.name });
+                    callback(reader.result as string, { alt: file.name });
                   };
                   reader.readAsDataURL(file);
                 }
