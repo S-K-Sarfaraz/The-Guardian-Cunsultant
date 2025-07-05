@@ -48,7 +48,7 @@ export default function AddBlog({ editingBlogId, onSaveSuccess }: AddBlogProps) 
     }
   }, [editingBlogId]);
 
-  const handleEditorChange = (newContent) => {
+  const handleEditorChange = (newContent: string) => {
     setContent(newContent);
   };
 
