@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import React, { useRef } from "react";
 import { ArrowRight } from "lucide-react";
-import Cog from "./../assets/cog.png";
+import Cog from "./../assets/Cog.png";
 import CylinderImage from "./../assets/cylinder.png";
 import NoddleImage from "./../assets/noodle.png";
 import { motion, useScroll, useTransform } from "framer-motion";
