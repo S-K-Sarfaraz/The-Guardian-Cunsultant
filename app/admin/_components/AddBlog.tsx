@@ -8,12 +8,17 @@ import { useId } from "react";
 import { toast } from "sonner";
 
 
+
 const Editor = dynamic(
   () => import("@tinymce/tinymce-react").then((mod) => mod.Editor as any),
   {
     ssr: false,
   }
 );
+type AddBlogProps = {
+  editingBlogId?: string;
+  onSaveSuccess?: () => void;
+};
 
 export default function AddBlog({ editingBlogId, onSaveSuccess }) {
   const [content, setContent] = useState("");
