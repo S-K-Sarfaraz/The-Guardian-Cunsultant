@@ -6,10 +6,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useId } from "react";
 import { toast } from "sonner";
+import type { Editor as TinyMCEEditor } from "@tinymce/tinymce-react";
+import type { EditorProps } from "@tinymce/tinymce-react";
 
 // Dynamically import TinyMCE Editor
-const Editor = dynamic(
-  () => import("@tinymce/tinymce-react").then((mod) => mod.Editor),
+const Editor = dynamic<EditorProps>(
+  () =>
+    import("@tinymce/tinymce-react").then((mod) => mod.Editor as typeof TinyMCEEditor),
   { ssr: false }
 );
 
