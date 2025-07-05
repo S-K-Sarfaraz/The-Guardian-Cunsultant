@@ -4,7 +4,7 @@ import { useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import Header from "@/app/_components/Header";
 
-function BlogDetail({ onEdit }) {
+export function BlogDetail({ onEdit }) {
   const { id } = useParams();
   const [blog, setBlog] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -114,4 +114,4 @@ function BlogDetail({ onEdit }) {
   );
 }
 
-export default BlogDetail;
+
