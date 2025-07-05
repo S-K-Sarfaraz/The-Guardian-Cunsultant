@@ -20,7 +20,7 @@ type AddBlogProps = {
   onSaveSuccess?: () => void;
 };
 
-export default function AddBlog({ editingBlogId, onSaveSuccess }) {
+export default function AddBlog({ editingBlogId, onSaveSuccess }: AddBlogProps) {
   const [content, setContent] = useState("");
   const [title, setTitle] = useState("");
   const [bannerImage, setBannerImage] = useState("");
