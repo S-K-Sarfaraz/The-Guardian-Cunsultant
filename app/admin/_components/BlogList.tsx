@@ -2,22 +2,25 @@
 import { useEffect, useState, useCallback } from "react";
 import { Blog7 } from "@/components/blog7";
 
-function BlogList({ onEdit }) {
-  const [data, setData] = useState(null);
+type BlogListProps = {
+  onEdit: (id: string) => void; // adjust this type based on your actual `onEdit` signature
+};
+
+function BlogList({ onEdit }: BlogListProps) {
+  const [data, setData] = useState<any>(null); // optionally define a more specific type
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // Function to fetch the blog data.
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
       const res = await fetch("/api/blog");
       const result = await res.json();
       if (result.success) {
-        const posts = result.data.map(blog => ({
+        const posts = result.data.map((blog: any) => ({
           id: blog.id,
           title: blog.title,
-          content: blog.content, // Include full content for editing
+          content: blog.content,
           summary:
             blog.content.length > 150
               ? blog.content.slice(0, 150) + "..."
@@ -49,7 +52,6 @@ function BlogList({ onEdit }) {
     }
   }, []);
 
-  // Initial data fetch
   useEffect(() => {
     fetchData();
   }, [fetchData]);
@@ -57,7 +59,6 @@ function BlogList({ onEdit }) {
   if (loading) return <p>Loading...</p>;
   if (error) return <p>{error}</p>;
 
-  // Wrap the Blog7 component with a container to allow vertical scrolling
   return (
     <div style={{ overflowY: "auto", maxHeight: "calc(100vh - 100px)" }}>
       <Blog7 {...data} onEdit={onEdit} onRefresh={fetchData} />
