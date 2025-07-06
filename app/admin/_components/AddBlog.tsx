@@ -16,9 +16,12 @@ import { Editor as TinyMCEEditor } from "@tinymce/tinymce-react";
 type TinyMCEEditorProps = ComponentProps<typeof TinyMCEEditor>;
 
 // Dynamically import the Editor with correct typing
-const Editor = dynamic(() => import("@tinymce/tinymce-react").then((mod) => mod.Editor as any), {
-  ssr: false,
-});
+const Editor = dynamic<TinyMCEEditorProps>(
+  () => import("@tinymce/tinymce-react").then((mod) => mod.Editor),
+  {
+    ssr: false,
+  }
+);
 
 
 
