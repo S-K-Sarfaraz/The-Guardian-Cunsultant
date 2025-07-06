@@ -172,7 +172,11 @@ export default function AddBlog({ editingBlogId, onSaveSuccess }: AddBlogProps) 
           image_title: true,
           automatic_uploads: true,
           file_picker_types: "image",
-          file_picker_callback: (callback, value, meta) => {
+          file_picker_callback: (
+            callback: (url: string, meta?: { alt?: string }) => void,
+            value: string,
+            meta: { filetype: string }
+          ) => {
             if (meta.filetype === "image") {
               const input = document.createElement("input");
               input.setAttribute("type", "file");
