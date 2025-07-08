@@ -43,7 +43,7 @@ type BlogApiResponse = {
 };
 
 type AddBlogProps = {
-  editingBlogId?: string;
+  editingBlogId?: string | null;
   onSaveSuccess?: () => void;
 };
 
