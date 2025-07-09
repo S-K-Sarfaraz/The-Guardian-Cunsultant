@@ -78,16 +78,48 @@ export default function AddBlog({ editingBlogId, onSaveSuccess }: AddBlogProps) 
     setContent(newContent);
   };
 
-  const handleBannerImageChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setBannerImage(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+  // const handleBannerImageChange = (e: ChangeEvent<HTMLInputElement>) => {
+  //   const file = e.target.files?.[0];
+  //   if (file) {
+  //     const reader = new FileReader();
+  //     reader.onloadend = () => {
+  //       setBannerImage(reader.result as string);
+  //     };
+  //     reader.readAsDataURL(file);
+  //   }
+  // };
+
+  const handleBannerImageChange = async (e: ChangeEvent<HTMLInputElement>) => {
+  const file = e.target.files?.[0];
+  if (!file) return;
+
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("upload_preset", "gardian-consultant"); // Replace with your actual preset
+
+  try {
+    const res = await fetch(
+      "https://api.cloudinary.com/v1_1/diuwrhyim/image/upload", // Replace with your cloud name
+      {
+        method: "POST",
+        body: formData,
+      }
+    );
+
+    const data = await res.json();
+
+    if (data.secure_url) {
+      setBannerImage(data.secure_url);
+      toast.success("Image uploaded successfully");
+    } else {
+      toast.error("Image upload failed");
     }
-  };
+  } catch (err) {
+    console.error("Cloudinary upload error:", err);
+    toast.error("Image upload error");
+  }
+};
+
 
   const handleSave = async () => {
     setLoading(true);
@@ -182,15 +214,22 @@ export default function AddBlog({ editingBlogId, onSaveSuccess }: AddBlogProps) 
               const input = document.createElement("input");
               input.setAttribute("type", "file");
               input.setAttribute("accept", "image/*");
-              input.onchange = function () {
+
+              input.onchange = async function () {
                 const file = (this as HTMLInputElement).files?.[0];
-                if (file) {
-                  const reader = new FileReader();
-                  reader.onload = function () {
-                    callback(reader.result as string, { alt: file.name });
-                  };
-                  reader.readAsDataURL(file);
-                }
+                if (!file) return;
+
+                const formData = new FormData();
+                formData.append("file", file);
+                formData.append("upload_preset", "gardian-consultant");
+
+                const res = await fetch("https://api.cloudinary.com/v1_1/diuwrhyim/image/upload", {
+                  method: "POST",
+                  body: formData,
+                });
+
+                const data = await res.json();
+                callback(data.secure_url, { alt: file.name });
               };
               input.click();
             }
