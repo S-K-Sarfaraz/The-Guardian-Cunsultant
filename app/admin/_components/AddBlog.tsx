@@ -111,6 +111,7 @@ export default function AddBlog({ editingBlogId, onSaveSuccess }: AddBlogProps) 
         );
         onSaveSuccess?.();
       } else {
+        console.error("API error:", data);
         toast.error(editingBlogId ? "Failed to update Blog." : "Failed to save Blog.");
       }
     } catch (error) {
